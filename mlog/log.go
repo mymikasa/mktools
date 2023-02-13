@@ -19,26 +19,6 @@ type Logger interface {
 	OutputPath(path string) (err error)
 }
 
-func init() {
-	r := &defaultLogger{
-		logger: logrus.New(),
-	}
-	level := os.Getenv("ROCKETMQ_GO_LOG_LEVEL")
-	switch strings.ToLower(level) {
-	case "debug":
-		r.logger.SetLevel(logrus.DebugLevel)
-	case "warn":
-		r.logger.SetLevel(logrus.WarnLevel)
-	case "error":
-		r.logger.SetLevel(logrus.ErrorLevel)
-	case "fatal":
-		r.logger.SetLevel(logrus.FatalLevel)
-	default:
-		r.logger.SetLevel(logrus.InfoLevel)
-	}
-	mLog = r
-}
-
 var mLog Logger
 
 type defaultLogger struct {
@@ -107,17 +87,6 @@ func (l *defaultLogger) Level(level string) {
 		l.logger.SetLevel(logrus.InfoLevel)
 	}
 }
-
-// type Config struct {
-// 	OutputPath    string
-// 	MaxFileSizeMB int
-// 	MaxBackups    int
-// 	MaxAges       int
-// 	Compress      bool
-// 	LocalTime     bool
-// }
-
-// func makeLogger(o *Options)
 
 func (c *ConfigOptions) Logger() *lumberjack.Logger {
 	return &lumberjack.Logger{
@@ -203,4 +172,24 @@ func MustSetUp(options ...Option) {
 	for _, opt := range options {
 		opt(o)
 	}
+
+	r := &defaultLogger{
+		logger: logrus.New(),
+	}
+	level := os.Getenv("ROCKETMQ_GO_LOG_LEVEL")
+	switch strings.ToLower(level) {
+	case "debug":
+		r.logger.SetLevel(logrus.DebugLevel)
+	case "warn":
+		r.logger.SetLevel(logrus.WarnLevel)
+	case "error":
+		r.logger.SetLevel(logrus.ErrorLevel)
+	case "fatal":
+		r.logger.SetLevel(logrus.FatalLevel)
+	default:
+		r.logger.SetLevel(logrus.InfoLevel)
+	}
+	mLog = r
+
+	SetOutPutPath(o.OutputPath)
 }
