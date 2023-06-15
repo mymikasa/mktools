@@ -131,6 +131,46 @@ func (q *Deque[T]) Index(f func(T) bool) int {
 	return -1
 }
 
+func (q *Deque[T]) Insert(index int, elem T) {
+	if index < 0 || index > q.Len() {
+		panic(outOfRangeText(index, q.count))
+	}
+
+	if index*2 < q.count {
+		q.PushFront(elem)
+		front := q.head
+		for i := 0; i < index; i++ {
+			next := q.next(front)
+			q.buf[front], q.buf[next] = q.buf[next], q.buf[front]
+			front = next
+		}
+		return
+	}
+
+	swaps := q.count - index
+	q.PushBack(elem)
+	back := q.tail
+	for i := 0; i < swaps; i++ {
+		prev := q.prev(back)
+		q.buf[back], q.buf[prev] = q.buf[prev], q.buf[back]
+		back = prev
+	}
+}
+
+func (q *Deque[T]) Remove(index int) {
+	if index < 0 || index > q.Len() {
+		panic(outOfRangeText(index, q.Len()))
+	}
+
+	rm := (q.head + index) & (len(q.buf) - 1)
+
+	if index*2 < q.count {
+		for i := 0; i < index; i++ {
+
+		}
+	}
+}
+
 func (q *Deque[T]) RIndex(f func(T) bool) int {
 	if q.Len() > 0 {
 		modBits := len(q.buf) - 1
